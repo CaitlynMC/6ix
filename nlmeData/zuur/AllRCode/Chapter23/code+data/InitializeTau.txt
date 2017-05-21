@@ -1,3 +1,0 @@
-list(
-  eps.tau=1
-)
