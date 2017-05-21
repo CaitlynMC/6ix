@@ -1,0 +1,18 @@
+{
+    "contents" : "require(stats)\n\narima.sim(model, n, rand.gen = rnorm, innov = rand.gen(n, ...),\n          n.start = NA, start.innov = rand.gen(n.start, ...),\n          ...)",
+    "created" : 1472753914790.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3466118488",
+    "id" : "BD3ECB0C",
+    "lastKnownWriteTime" : 1472753935,
+    "path" : "~/Documents/subversion/public/projects/6ix/ARIMASims.R",
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "type" : "r_source"
+}
