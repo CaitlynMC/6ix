@@ -4,16 +4,20 @@
 %  Author: C. M. McColeman
 %  Date Created: September 3 2016
 %  Last Edit: Oct 25 2016 - folded in feedback from alpha testers
+%             spring 2017 - added in drawSeries2, drawSeries3 and required
+%                           functions
+%             summer 2017 - added in drawSeries4, "experiment7" for the
+%                           dissertation
 %
 %  Cognitive Science Lab, Simon Fraser University
-%  Originally Created For: 6ix, conceptually experiment 2
+%  Originally Created For: 6ix
 %
 %  Reviewed: []
 %  Verified: []
 %
-%  INPUT: [Insert Function Inputs here (if any)]
+%  INPUT: None
 %
-%  OUTPUT: [Insert Outputs of this script]
+%  OUTPUT: Saves data to current directory for analysis
 %
 %  Additional Scripts Used: candleExperimentInstructions.m,
 %  candleDemographics.m, blowOutTheCandle.m, candleSaveExpLvl.m,
@@ -35,15 +39,18 @@ dbmode = 0;
 nMinutes = 55;
 allowableErrorToZero = 500;
 
-if rand < 1/8
+diceRoll = rand
+
+if diceRoll < 0
     sExpName='drawSeries';
-elseif rand < 7/8
+elseif diceRoll < 0
     sExpName='drawSeries2'; % change to drawSeries2 to add noise channels
-elseif rand < 1
-    sExpName='drawSeries3'; % we'll just try every 6th person for now; important thing is to get drawSeries2 finished
+elseif diceRoll < 0
+    sExpName='drawSeries3'; % change to drawSeries3 to manipulate spread factors
+elseif diceRoll < 1
+    sExpName='drawSeries4'; 
 end
 
-sExpName = 'drawSeries'
 
 experimentOpenTime = tic;
 % changed March 27 for end-of-semester run -- want to get data for
@@ -107,8 +114,7 @@ if ~dbmode
     mkdir([timeIDDir '/demoBK/']);
     save([timeIDDir '/demoBK/demoResps.mat'], 'demoResp', 'populateRow')
 else
-    demoResp{2}=3;
-    
+    demoResp{2}=3; 
 end
 
 % Get the screen numbers
@@ -200,11 +206,11 @@ try % the whole experiment is in a try/catch, so in the event of an error you're
     trialOrder = randsample(40,200,1);
     
     % Call function to run particpants through instructions.
-    instructionTroubles = candleExperimentInstructions(screenXpixels, screenYpixels, windowPtr, bkgnCol, foreGrndL, foreGrndD, xTent, upKey, downKey, leftKey, rightKey, plusKey, minusKey, enterKey, fKey, rKey, vKey, aKey, candleCol, shadowCol,allCoords);
+    candleExperimentInstructions(screenXpixels, screenYpixels, windowPtr, bkgnCol, foreGrndL, foreGrndD, xTent, upKey, downKey, leftKey, rightKey, plusKey, minusKey, enterKey, fKey, rKey, vKey, aKey, candleCol, shadowCol,allCoords);
     pause(2)
     trialNumber=0;
     testIfTimeUp=toc(experimentOpenTime);
-    highestPossible = 60; % totally arbitrary, but structurally important for drawSeriesAsCandle.m.
+    highestPossible = 60; % value is totally arbitrary, but structurally important for drawSeriesAsCandle.m; required for glyphLearning exps
     
     while ~(testIfTimeUp > 60*nMinutes) && (trialNumber+1)<length(trialOrder)
         

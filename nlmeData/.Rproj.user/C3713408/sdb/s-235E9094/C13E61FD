@@ -1,0 +1,18 @@
+{
+    "contents" : "# load partial columns from PPMI data and examine aggregate measures as indicated by the variable derivation documentation. \nsetwd(\"~/documents/data/PPMI/nonmotorassess\")\n# invoke SQL functionality for CSV reading. This will allow us to select subsets of full .csv files\ninstall.packages('sqldf') \n\nlibrary(sqldf)\n\n\n#Benton_Judgment_of_Line_Orientation.csv\n\ntestBJLO = read.table(\"Benton_Judgment_of_Line_Orientation.csv\", na.rm=T)",
+    "created" : 1471560540719.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2225429234",
+    "id" : "C13E61FD",
+    "lastKnownWriteTime" : 1471561251,
+    "path" : "~/Documents/subversion/public/projects/6ix/nlmeData/derivedVariables.R",
+    "project_path" : "derivedVariables.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

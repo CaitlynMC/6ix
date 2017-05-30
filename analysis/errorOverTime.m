@@ -34,7 +34,11 @@ closeErr = abs(corrClose-respClose);
 highErr = abs(corrHigh-respHigh);
 lowErr = abs(corrLow-respLow);
 
-edgeVals = 10:25:200; % bins of 20. (200 trials in drawSeries) %% There are only 199 trials -RCAB 
+if findstr('drawSeries', sExpName)
+    edgeVals = 10:25:200; % bins of 25. (200 trials in drawSeries) %% There are only 199 trials -RCAB
+elseif findstr('glyphLearning', sExpName)
+    edgeVals = 5:5:40; % bins of 5 (40 trials in glyphLearning)
+end
 
 % intialize storage matrices as nans 
 openBinned = nan(length(trID),length(edgeVals),1);
@@ -58,7 +62,14 @@ for i = 1:length(edgeVals)
     closeBinned(1:sum(trialBinIdx==i),i)=closeErr(trialBinIdx==i);
     highBinned(1:sum(trialBinIdx==i),i)=highErr(trialBinIdx==i);
     lowBinned(1:sum(trialBinIdx==i),i)=lowErr(trialBinIdx==i);
-    
+   
+   % 0 error values in response means that it wasn't the queried question. Remove.  
+    if findstr('glyphLearning', sExpName)
+        openBinned(openBinned(:,i)==0)=NaN;
+        closeBinned(openBinned(:,i)==0)=NaN;
+        highBinned(openBinned(:,i)==0)=NaN;
+        lowBinned(openBinned(:,i)==0)=NaN;
+    end
 end
 
 % added after review: visualizing error to justify log transformation

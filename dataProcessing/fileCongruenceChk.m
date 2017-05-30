@@ -52,7 +52,7 @@ function fileCongruenceChk(rawExpLvl)
 %  all of the data in a single directory (C.M. 13" MacBook or the Powerhouse
 %  computer) and that you've navigated to said directory (~/documents/caitlyn/data/... )
 
-expLvlIn = readtable(rawExpLvl,'Delimiter',',','ReadVariableNames',true);
+expLvlIn = readtable(rawExpLvl,'Delimiter',';','ReadVariableNames',true);
 expLvlDims = size(expLvlIn);
 
 timeIDDirCongruence = nan(expLvlDims(1), 1); % intialize record of whether the timeIDDir is at trial lvl
@@ -89,14 +89,14 @@ for i = 1:length(charTrLvl)
         if ~(strcmpi(boothNum, pathToFileCell{end-2}))
             appendDir = ['/' pathToFileCell{end-2}];
         else
-            appendDir = ''; %no subdirectory
+            appendDir = '/'; %no subdirectory
         end
         
         % 1) does the directory name exist as timeIDDir in experiment
         % level?
         dirSucessRec = strfind(expLvlIn.timeIDDir,dirName);
         dirSucessRec=cellfun(@numel, dirSucessRec);
-        dirSucessRecIdx = find(dirSucessRec);
+        dirSucessRecIdx = max(find(dirSucessRec));
         
         timeIDDirCongruence(dirSucessRecIdx)=1;
         % load trial level .csv file
@@ -144,7 +144,7 @@ for i = 1:length(charTrLvl)
             display(['gathering info in a separate process via buildExpLvlLine.m'])
             
             % add experiment level data to the raw exp lvl file.
-            buildExpLvlLine(dirName, [boothNum appendDir], rawExpLvl);
+            buildExpLvlLine(dirName, [boothNum appendDir], {rawExpLvl});
             
         elseif (expLvlIn.Gender(dirSucessRecIdx)==5 && (expLvlIn.EconExperience(dirSucessRecIdx)==5 && expLvlIn.MathExperience(dirSucessRecIdx)==7 && expLvlIn.ColourBlindStatus(dirSucessRecIdx)==7))
             display(['all survey responses are "prefer not to answer": ' dirName])
@@ -155,10 +155,10 @@ for i = 1:length(charTrLvl)
     end
     
 end
-%
-% expTabUpdate = table(timeIDDirCongruence);
-%
-% expTableOut = [expLvlIn expTabUpdate];
-% writetable(expTableOut,[currDir '/edited/CandleExpLvl.csv'],'Delimiter',';')
+
+ expTabUpdate = table(timeIDDirCongruence);
+
+ expTableOut = [expLvlIn expTabUpdate];
+ writetable(expTableOut,[currDir '/edited/CandleExpLvl.csv'],'Delimiter',';')
 
 end
