@@ -64,20 +64,11 @@ populateRow = find(cellfun(@isempty, expLvlRec),1);
 for j = 1:size(expParameters,2)
     expLvlRec{populateRow,j}=expParameters(runThisRow,j);
     if strcmpi(expLvlRec{1,j}, 'CandleColour') && (strcmpi(sExperiment,'drawSeries') || strcmpi(sExperiment,'glyphLearning') || strcmpi(sExperiment,'glyphLearning2'))
-           %{
+
         candleCol=candleCondition{expParameters(runThisRow,j)};
         bgGray = bkgCol{expParameters(runThisRow,j)};
         shadowCol = shadowCondition{expParameters(runThisRow,j)};
-           %}
-        % %{
-        % edited at the end of spring 2017 [march 27 2017] to get condition
-        % four in for easier comparison between subsequent experiments whe
-        % running drawSeries
-        
-        candleCol = candleCondition{4};
-        bgGray = bkgCol{4};
-        shadowCol = shadowCondition{4};
-        % %}
+
     elseif strcmpi(expLvlRec{1,j}, 'CandleColour') && (strcmpi(sExperiment,'drawSeries2') || strcmpi(sExperiment,'drawSeries3') || strcmpi(sExperiment,'glyphLearning3')) % added March 3 2017
         
         rowAdapter = mod(runThisRow,2)+1;

@@ -5,7 +5,7 @@
 
 %  Author: C. M. McColeman
 %  Date Created: March 6 2017
-%  Last Edit: 
+%  Last Edit: June 6 2017 to pull in the spreadFactor variable
 %  
 %  Cognitive Science Lab, Simon Fraser University 
 %  Originally Created For: drawSeries, glyphLearning... 6ix experiment
@@ -26,7 +26,7 @@ MaybeOpenMySQL('experiments')
 
 % 1. Pull candle colours, shadow colours from candlesExpLvl
 
-[ShadowColour, CloseHighColour, CloseLowColour, subjId] = mysql(['select shadowColour, closeHighColour, closeLowColour, subjectnumber from candlesExpLvl']);
+[ShadowColour, CloseHighColour, CloseLowColour, subjId, timeIDDir, experimentName] = mysql(['select shadowColour, closeHighColour, closeLowColour, subjectnumber, timeIDDir, expName from candlesExpLvl']);
 CloseHighColour2 = CloseHighColour;
 % extra space at the end of CloseHighColour. Get rid of it for easier
 % string comparison
@@ -39,6 +39,8 @@ candleBodz(1:length(arrowRec),1) = arrowRec; % 1 means it's up/down candle bodie
 
 for i = 1:length(CloseHighColour)
    
+    
+    %% candle body condition
     % candle bodies 
     if numel(strfind(CloseHighColour{i},'1'))==1 || numel(strfind(CloseHighColour{i},'255'))==1
        candleBodyRec{i,1}='redGreen';
@@ -84,10 +86,33 @@ for i = 1:length(CloseHighColour)
         conditionRecord(i,1)='0';
         
     end
+    
+    
+    %% candle spread factor condition
+    if strcmpi(strtrim(experimentName{i}), 'drawSeries3') | strcmpi(strtrim(experimentName{i}), 'glyphLearning3'); 
+       
+        % use the expLvlOrganizer.m strategy to reproduce the spreadFactor
+        % assignment. 
+        %1. everything before the first "_" in the subject number tells us
+        %the run order. Extract run order that way. 
+        splitOut = regexp(subjId{i}, '\_', 'split');
+        rowIDRun = str2num(splitOut{1});
+        
+        % establish the spreadFactor
+        possSpread = [.5, 1, 2];
+        spreadFactIn = possSpread(mod(rowIDRun,3)+1);
+        
+        % assign to output vector
+        spreadFactor(i,1)=spreadFactIn;
+    else
+        spreadFactor(i,1)=1;
+        
+    end
 end
     
 
 %requires superpriv access to upload data. Please do not delete this
 %comment. 
 %SQLAddColumn('candlesExpLvl', 'candleCondition', conditionRecord, 'VARCHAR(5)')
+%SQLAddColumn('candlesExpLvl', 'spreadFactor', spreadFactor, 'VARCHAR(5)')
 

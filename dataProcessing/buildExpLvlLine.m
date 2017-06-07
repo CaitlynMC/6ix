@@ -4,7 +4,8 @@
 %
 %  Author: C. M. McColeman
 %  Date Created: Jan 14 2017
-%  Last Edit:
+%  Last Edit: May 29 2017 - a more robust extraction strategy for
+%       information about candle cols
 %
 %  Cognitive Science Lab, Simon Fraser University
 %  Originally Created For: 6ix
@@ -77,13 +78,59 @@ negIdx = OCDiff<0;
 closeHigh = unique(potentialLowCols(negIdx));
 closeLow = unique(potentialLowCols(~negIdx));
 
+% go into the expLvlRec.mat file to pull out information for this participant
+% the time-based identifier out of expLvlRec
+arrayIn = expLvlRec(:,14);
+% the time-based identifier out of participantDataDir
+if numel(findstr(participantDataDir, '/'))>0
+    [timeDir, nonMatching]=regexp(participantDataDir, '(?<=\/)(.*?)(?=\/)', 'match');
+    timeDir = timeDir(2:end); % get rid of leading slash
+else
+    timeDir = participantDataDir;
+end
+findSubIdx = strcmpi(arrayIn, {timeDir}); % find subject number in exp lvl matching subject number in trial lvl
+
+if sum(findSubIdx)==0; display(['No data for ' participantDataDir]);
+    CloseLowColour = ''; CloseHighColour = ''; ShadowColour = '';
+elseif sum(strcmpi(trialLvlDat{1,1}{1}, {'glyphLearning3', 'drawSeries2', 'drawSeries3'}))>0
+    rowAdapter = mod(runThisRow,2)+1;
+    display([ participantDataDir ': experiment level data updating.'])
+    % These experiments had reduced conditions to A and D. Use adaptive
+    % coding as per expLvlOrganizer
+    
+    if rowAdapter == 1
+        CloseLowColour = ['[' mat2str([255 0 0]) ']'];
+        CloseHighColour = ['[' mat2str([0 255 0]) ']'];
+        
+        bgGray = bkgCol{1}; % 44% black grey background
+        ShadowColour = mat2str(shadowCondition{1}); % black shadows
+    elseif rowAdapter == 2
+        CloseLowColour = mat2str([191.25 191.25 191.25]);
+        CloseHighColour = CloseLowColour;
+        bgGray = bkgCol{4}; % 50% black grey background
+        ShadowColour = mat2str(shadowCondition{4}); % yellow shadows
+    end
+else
+    display([ participantDataDir 'experiment level data updating.'])
+    % glyphLearning 1,2 and drawSeries1 had four conditions
+    
+    runThisRow = expLvlRec{findSubIdx, 10};
+    j = 5; % the fifth row is "CandleColour" used by expLvlOrganizer to trigger this condition:
+    
+    % using information from experimentLvlPresentation.mat
+    candleCol=candleCondition{expParameters(runThisRow,j)};
+    CloseLowColour = mat2str(candleCol{1});
+    CloseHighColour = mat2str(candleCol{2});
+    bgGray = bkgCol{expParameters(runThisRow,j)};
+    ShadowColour = mat2str(shadowCondition{expParameters(runThisRow,j)});
+end
 if ~(isempty(closeHigh)||isempty(closeLow))
     % column 7-19
-    CloseLowColour = ['[' num2str(str2num(closeLow{1})*255) ']'];
-    CloseHighColour = ['[' num2str(str2num(closeHigh{1})*255) ']'];
-else
-    CloseLowColour = ''; CloseHighColour = '';
+    CloseLowColour = mat2str(closeLow{1});
+    CloseHighColour = mat2str(closeHigh{1});
 end
+
+
 StartTimeClock = trialLvlDat{1,36}{1};
 EndTimeClock = trialLvlDat{1,36}{length(trialLvlDat{1,36})};
 timeIDDir = participantDataDir;
@@ -105,7 +152,6 @@ for i=1:length(expLvlRec)
     end
 end
 if sum(subIdx)>0
-    
     if strcmpi(expLvlRec{thisSubRowID,12}, 'drawSeries2') % noise only matters for drawSeries2
         % column 22
         NoisyDimension = expLvlRec{thisSubRowID,6}; %noise source is the sixth column
@@ -121,38 +167,22 @@ if sum(subIdx)>0
 else
     % column 22
     NoisyDimension = NaN;
-    runThisRow = NaN;
-    shadColRow = NaN;
-    ShadowColour = '';
+    
 end
-
-
-
 
 TrialsCompleted = length(trialLvlDat{1,36});
 TotalPoints = trialLvlDat{1,41}(length(trialLvlDat{1,41}));
 
-
-%{
-thisDudeOverview = table(ExpName, SubjectNumber, OpenColumn, CloseColumn, HighColumn, ...
-    LowColumn, CloseLowColour, CloseHighColour, StartTimeClock, EndTimeClock, ...
-    timeIDDir, Booth, ComputerType, Gender, ColourBlindStatus, ...
-    EconExperience, MathExperience, ScreenXPixels, ScreenYPixels, NoisyDimension,...
-    ScreenXPixels, ScreenYPixels, NoisyDimension, TrialsCompleted, TotalPoints, ...
-    ShadowColour, spreadFactor);
-%}
-
 fileID = fopen(rawExpLvl{1}, 'at'); % open file to append data
 
 % add a row the explvl table
-fprintf(fileID,['%s , %s , %s , %s , %s , %s , %s, %s , ' ...
-    '%s, %s, %s , %d, %d, %d, %d, ' ...
-    ' %d, %d, %d, %d, %d, %d, %f, %s\r\n'], ...
+fprintf(fileID,['%s; %s; %s; %s; %s; %s; %s; %s; ' ...
+    '%s; %s; %s; %d; %d; %d; %d; ' ...
+    ' %d; %d; %d; %d; %d; %d; %f; %s\r\n'], ...
     ExpName, SubjectNumber, OpenColumn, CloseColumn, HighColumn, LowColumn, CloseLowColour, CloseHighColour,...
     StartTimeClock, EndTimeClock, timeIDDir, Booth, ComputerType, Gender, ColourBlindStatus, ...
     EconExperience, MathExperience, screenXPixels, screenYPixels, NoisyDimension, TrialsCompleted, TotalPoints, ShadowColour);
 
 fclose(fileID)
 
-display('experiment level data updated..')
 
