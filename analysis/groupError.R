@@ -1,15 +1,14 @@
-#  This runs analysis on the first two candle experiments (drawSeries1 and glyphLearning1)
+#  This runs analysis on the user performance error during the candle experiments.
 #  
 #  Author: Caitlyn McColeman
 #  Date Created: March 15 2017 
-#  Last Edit: May 30-June 6 2017 - major re-write to encompass multiple experiments and process additional variables of interest for DS2-3, GL3.
+#  Last Edit: May 30-June 8 2017 - major re-write to encompass multiple experiments and process additional variables of interest for DS2-3, GL3.
 #  
 #  Cognitive Science Lab, Simon Fraser University 
 #  Originally Created For: 6ix
 #  
 #  Reviewed: Jordan B. 23/03/2017 (prior to major rewrite)
-#  May 30 re-write and extension + 
-#  June 6 additional data processing for DS2, DS3 and GL1 reviewed: []
+#  re-write reviewed: []
 #
 #  Verified: [] 
 #
@@ -140,8 +139,6 @@ for (i in candleExpLvl$timeIDDir) {
 candleDatInDS3$spreadFactor = factor(spreadRecTemp) # append to data frame for analysis
 candleDatInGL3$spreadFactor = factor(spreadRecTempGL) # append to data frame for analysis
 
-
-
   
 # format data and calculate by-subject means; keep a record of condition.
 meansDS1 = aggregate(candleDatInDS$ErrorVal, by = list(candleDatInDS$dirNameRec, candleDatInDS$candleCondition), FUN=mean, na.rm=TRUE)
@@ -158,33 +155,42 @@ meansGL3 = aggregate(candleDatInGL3$ErrorVal, by = list(candleDatInGL3$dirNameRe
 ############################################################################
 
 # LMER model for condition (drawSeries)
-conditionModDS <- test = glht(HUC04_model,linfct=mcp(HUC04="Tukey"))(log(ErrorVal) ~ TrialID * candleCondition + (TrialID | dirNameRec), candleDatInDS, REML = FALSE)
+conditionModDS <- lmer(log(ErrorVal) ~ TrialID * candleCondition + (TrialID | dirNameRec), candleDatInDS, REML = FALSE)
 coefsDS <- data.frame(coef(summary(conditionModDS))) # added after review
 coefsDS$p.z <- 2* (1-pnorm(abs(coefsDS$t.value))) # normal approximation for p values (via Mirman: http://mindingthebrain.blogspot.ca/2014/02/three-ways-to-get-parameter-specific-p.html)
+conditionTest = glht(conditionModDS,linfct=mcp(candleCondition="Tukey"))
 
 # LMER model for condition (drawSeries2)
 conditionModDS2 <- lmer(log(ErrorVal) ~ TrialID * candleCondition + noisyDimension + (TrialID | dirNameRec), candleDatInDS2, REML = FALSE)
 coefsDS2 <- data.frame(coef(summary(conditionModDS2))) # added after review
 coefsDS2$p.z <- 2* (1-pnorm(abs(coefsDS2$t.value))) # normal approximation for p values (via Mirman: http://mindingthebrain.blogspot.ca/2014/02/three-ways-to-get-parameter-specific-p.html)
+noiseTest = glht(conditionModDS2,linfct=mcp(noisyDimension="Tukey"))
 
 # LMER model for condition (drawSeries3)
 conditionModDS3 <- lmer(log(ErrorVal) ~ TrialID * candleCondition * spreadFactor + (TrialID | dirNameRec), candleDatInDS3, REML = FALSE)
 coefsDS3 <- data.frame(coef(summary(conditionModDS3))) # added after review
 coefsDS3$p.z <- 2* (1-pnorm(abs(coefsDS3$t.value))) # normal approximation for p values (via Mirman: http://mindingthebrain.blogspot.ca/2014/02/three-ways-to-get-parameter-specific-p.html)
+spreadTest = glht(conditionModDS3,linfct=mcp(spreadFactor="Tukey"))
+
 
 # LMER model for condition (glyphLearning1)
 conditionModGL <- lmer(log(ErrorVal) ~ TrialID * candleCondition + (TrialID | dirNameRec), candleDatInGL, REML = FALSE)
 coefsGL <- data.frame(coef(summary(conditionModGL)))
 coefsGL$p.z <- 2* (1-pnorm(abs(coefsGL$t.value)))
+conditionTestGL = glht(conditionModGL,linfct=mcp(candleCondition="Tukey"))
 
 # LMER model for condition (glyphLearning2)
 conditionModGL2 <- lmer(log(ErrorVal) ~ TrialID * candleCondition + (TrialID | dirNameRec), candleDatInGL2, REML = FALSE)
 coefsGL2 <- data.frame(coef(summary(conditionModGL2)))
 coefsGL2$p.z <- 2* (1-pnorm(abs(coefsGL2$t.value)))
+gridConditionTestGL = glht(conditionModGL2,linfct=mcp(candleCondition="Tukey"))
 
+# LMER model for condition (glyphLearning3)
 conditionModGL3 <- lmer(log(ErrorVal) ~ TrialID * candleCondition * spreadFactor + (TrialID | dirNameRec), candleDatInGL3, REML = FALSE)
 coefsGL3 <- data.frame(coef(summary(conditionModGL3)))
 coefsGL3$p.z <- 2* (1-pnorm(abs(coefsGL3$t.value)))
+spreadTestGL = glht(conditionModGL3,linfct=mcp(spreadFactor="Tukey"))
+
 
 ############################################################################
 ############################### ANOVA tests  ###############################
