@@ -33,6 +33,8 @@ nMinutes = 25;
 
 displayFeedbackInfo = 0; % a debug toggle that's called in phase 4. 
 allowableErrorToZero = 125;
+bet = 0; betErrorClose = 0;
+
 
 condChooser = rand*10; 
 
@@ -503,7 +505,7 @@ try
                     [0 0 0], colourOut(~isnan(colourOut))', simulated100, datShadow, [[participantCandle(1,1) min(participantCandle([2 4],1)) participantCandle(3,1) max(participantCandle([2,4],1))]' [participantShadows(1,1) min(participantShadows([2 4],1)) participantShadows(3,1) max(participantShadows([2,4],1))]' [participantShadows(5,1) min(participantShadows([6 8],1)) participantShadows(7,1) max(participantShadows([6,8],1))]'],...
                     vblOn1, vblOn2, vblOn3, vblOn4, trialEndVbl, trialOrder, whichMod, ...
                     columnOrder,xTent, testIfTimeUp, 1, 0, ... % not recording diff, as we want to read the candle as standard orientation in interpreting open/close in this exp.
-                    1, 2, 3, dataSample, endTime, respBuffer, cumulativePts)
+                    1, 2, 3, dataSample, endTime, respBuffer, cumulativePts, bet, betErrorClose)
 
                 save([timeIDDir '/trial' num2str(trialNumber) '.mat'], ...
                     'vblOn1', 'vblOn2', 'vblOn3', 'vblOn4', 'errorVal', 'errorRec', 'startTime', 'endTime', 'candleCol', 'participantCandle', 'participantShadows', 'datShadow', 'allRects', 'colourOut', 'highestYVal', 'trialEndVbl', 'testIfTimeUp', 'questionID', 'screenXpixels', 'screenYpixels')
