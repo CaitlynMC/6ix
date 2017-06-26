@@ -101,7 +101,7 @@ if trialPhase == 101 % this detailed condition is for the glyph learning experim
     
     % set label marker, lines
     for i = 1:length(labelTick)
-       % if mod(highestPossible*spreadFactor-spreadFactor*tickDist*i,1)==0 % label whole numbers
+        % if mod(highestPossible*spreadFactor-spreadFactor*tickDist*i,1)==0 % label whole numbers
         if mod(highestPossible-tickDist*i,1)==0 % label whole numbers
             DrawFormattedText(windowPtr, num2str(highestPossible-tickDist*i, 4), allCoords(1,1)-30, labelTick(i)-5, textCol, bkgnCol(1));
         end
@@ -110,6 +110,5 @@ if trialPhase == 101 % this detailed condition is for the glyph learning experim
     
     Screen('DrawLines', windowPtr, tickMarker, 2, textCol);
     YLabVals= labelTick;
-else
-    
+
 end

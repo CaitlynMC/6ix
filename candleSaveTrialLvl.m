@@ -2,7 +2,7 @@ function candleSaveTrialLvl(timeIDDir, sExpName, subjectNumber, trialNumber, mad
     responseCandleCol, correctCandleCol, correctCandleBody, simulatedShadow, placementRects,...
     FixationOnset, StimulusOnset, ResponseOnset, FeedbackOnset, TrialOffset, trialOrder, whichMod, ...
     columnOrder,xTent, CumulativeParticipationTime, leftMost, endOfDayDiff, ...
-    candleBodCol, upperShadCol, lowerShadCol, dataSample, clockEnd, responseBuffer, cumulativePoints)
+    candleBodCol, upperShadCol, lowerShadCol, dataSample, clockEnd, responseBuffer, cumulativePoints, bet, btwnDayErr)
 
 %  Saves critical trial level information in a SQL-friendly format
 %  candleSaveExpLvl(subjectID, columnOrder, candleCol, startTime, endTime, timeIDDir, demoResp, screenXpixels, screenYpixels, noiseSource, sExpName)
@@ -10,6 +10,8 @@ function candleSaveTrialLvl(timeIDDir, sExpName, subjectNumber, trialNumber, mad
 %  Author: C. McC 
 %  Date Created: [19/10/16] 
 %  Last Edit: [23/10/16] last minute additions
+%             [17/06/17] including the relevant columns for drawSeries4
+%                           (bet, overall error)
 %  
 %  Cognitive Science Lab, Simon Fraser University 
 %  Originally Created For: 6ix - glyphLearning.m & drawSeries.m
@@ -24,7 +26,7 @@ function candleSaveTrialLvl(timeIDDir, sExpName, subjectNumber, trialNumber, mad
 %  Additional Scripts Used:
 %  
 %  Additional Comments: 
-
+display('line 29')
 arec=''; qrec='';
 if ~isempty(dataSample{trialOrder(trialNumber),11}) % old matlab can't handle model info
     arec = mat2str(dataSample{trialOrder(trialNumber), 11}.AR{1}(:));
@@ -39,8 +41,9 @@ end
 %{
 sExpName	Subject	TrialID	MadeResponse	WhichCandle	DefaultPlaceOrder	ResponseColour	CorrectColour	CorrectAnswerOpen	CorrectAnswerClose	CorrectAnswerHigh	CorrectAnswerLow	ParticipantAnswerOpen	ParticipantAnswerClose	ParticipantAnswerHigh	ParticipantAnswerLow	ErrorVal	FixationOnset	StimulusOnset	ResponseOnset	FeedbackOnset	Phase1RT	Phase2RT	Phase3RT	Phase4RT	TrialOrderIdx	whichMod	columnOrder	xTent	StockTitle	qrec	arrec	CumulativeParticipationTime
 %}
-
+display('line 44')
 whichCandle = defaultPlaceOrder(leftMost);
+
 %% 1. Establish open and close price for response and for "correct" answer
 
 % use the correct colour to index into the possible colours. First is open
@@ -53,7 +56,7 @@ else  % closed higher; "green" candle
     ParticipantAnswerOpen = placementRects(4, candleBodCol);
     ParticipantAnswerClose = placementRects(2, candleBodCol);
 end
-
+display('line 59')
 % correct response 
 if endOfDayDiff(end)>=0; % via drawSeriesAsCandle: endOfDayDiff = openPrices-closePrices.
     CorrectAnswerOpen = correctCandleBody(2);
@@ -71,7 +74,7 @@ CorrectAnswerHigh = simulatedShadow(2);
 CorrectAnswerLow = simulatedShadow(8);
 
 correctCandleXPos = correctCandleBody(1);
-
+display('line 77')
 %% 3. Check if the file exists
 % if the file exists, open it
 fileID = fopen([timeIDDir '/trialLvl.csv']);
@@ -94,9 +97,10 @@ if fileID == -1 % if the file doesn't exist, make a new one and add a header
         'Phase1RT', 'Phase2RT', 'Phase3RT', 'Phase4RT',...
         'TrialOrderIdx', 'whichMod', 'columnOrder', 'xTent','StockTitle','qrec','arrec',...
         'CumulativeParticipationTime', 'CandleXPosition', 'CorrectAnswerOCDiff', 'clockEndTime', ...
-        'candleBodCol', 'upperShadCol', 'lowerShadCol', 'TypedResponse', 'CumulativePoints')
+        'candleBodCol', 'upperShadCol', 'lowerShadCol', 'TypedResponse', 'CumulativePoints', 'Bet', 'BetweenCloseDiff')
 end
 fclose(fileID)
+display('line 103')
 fileID = fopen([timeIDDir '/trialLvl.csv'], 'at'); % open with append permission
 %% 4. Save data
 fprintf(fileID,['%s; %s; %d; %d; %d; %s; ' ... 
@@ -114,7 +118,8 @@ fprintf(fileID,['%s; %s; %d; %d; %d; %s; ' ...
     StimulusOnset-FixationOnset, ResponseOnset-StimulusOnset, FeedbackOnset-ResponseOnset, TrialOffset-FeedbackOnset, ...
     trialOrder(trialNumber), whichMod(1), mat2str(columnOrder), xTent, StockTitle, qrec, arec, ...
     CumulativeParticipationTime, correctCandleXPos, endOfDayDiff(end), clockEndTime,...
-    candleBodCol, upperShadCol, lowerShadCol, responseBuffer, cumulativePoints)
+    candleBodCol, upperShadCol, lowerShadCol, responseBuffer, cumulativePoints, bet, btwnDayErr)
 fclose(fileID)
+display('line 123')
 
 

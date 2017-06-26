@@ -35,7 +35,7 @@ while isInNext==0;
     
     % draw the next button
     [nextRect, YLabVals]= candleFrameStimuli(xTent, screenXpixels, screenYpixels, bkgnCol, 0, 0, 0, 0, windowPtr, 0, 0, textCol);
-    display('caught candle frame stimuli')
+    
     % get mouse coordinates, button selection
     [mx, my, buttons] = GetMouse(windowPtr);
     
